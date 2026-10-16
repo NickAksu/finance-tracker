@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+/*
+ * Цвета темы. Внутри Telegram значения переопределяет applyTelegramTheme() (inline-стили на <html>),
+ * вне Telegram работают светлые/тёмные значения ниже.
+ */
+:root {
+  --tg-bg: #ffffff;
+  --tg-text: #000000;
+  --tg-hint: #999999;
+  --tg-link: #2481cc;
+  --tg-button: #2481cc;
+  --tg-button-text: #ffffff;
+  --tg-secondary-bg: #efeff3;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --tg-bg: #212121;
+    --tg-text: #ffffff;
+    --tg-hint: #aaaaaa;
+    --tg-link: #8774e1;
+    --tg-button: #8774e1;
+    --tg-button-text: #ffffff;
+    --tg-secondary-bg: #0f0f0f;
+  }
+}
+
+/* Классы bg-tg-bg, text-tg-text, text-tg-hint, bg-tg-button … */
+@theme inline {
+  --color-tg-bg: var(--tg-bg);
+  --color-tg-text: var(--tg-text);
+  --color-tg-hint: var(--tg-hint);
+  --color-tg-link: var(--tg-link);
+  --color-tg-button: var(--tg-button);
+  --color-tg-button-text: var(--tg-button-text);
+  --color-tg-secondary-bg: var(--tg-secondary-bg);
+}
+
+html,
+body {
+  background-color: var(--tg-bg);
+  color: var(--tg-text);
+}
+
+body {
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+}

@@ -1,0 +1,15 @@
+# Шаблон секретов. Скопируйте в .dev.vars (dev) и .prod.vars (production)
+# и заполните. Сами .dev.vars и .prod.vars исключены из git.
+#
+# Загрузка в Cloudflare:
+#   npx wrangler secret bulk .dev.vars                      # dev-воркер
+#   npx wrangler secret bulk .prod.vars --env production    # prod-воркер
+
+# Токен бота из @BotFather (для dev и prod — разные боты)
+TELEGRAM_BOT_TOKEN=
+
+# Ключ Gemini из Google AI Studio
+GEMINI_API_KEY=
+
+# Секрет вебхука Telegram: openssl rand -hex 32
+WEBHOOK_SECRET=

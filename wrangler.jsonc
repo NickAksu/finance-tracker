@@ -1,0 +1,112 @@
+// Конфигурация Cloudflare Worker.
+// Несекретные настройки лежат здесь, секреты — в .dev.vars / .prod.vars (см. .dev.vars.example).
+// По умолчанию (без --env) используется dev-окружение; прод — только с `--env production`.
+// Привязки (d1, queues, ai, vars) не наследуются окружением — в production они продублированы.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "finance-tracker-dev",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+
+  // Mini App (собирается в webapp/dist). /webhook и /api/* обрабатывает Worker.
+  "assets": {
+    "directory": "./webapp/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/webhook", "/api/*"]
+  },
+
+  // Ежедневно 03:00 UTC: чистка служебных таблиц (позже — отчёты)
+  "triggers": { "crons": ["0 3 * * *"] },
+
+  "vars": {
+    "GEMINI_MODEL": "gemini-3.8-flash",
+    "WORKERS_AI_MODEL": "@cf/meta/llama-4-scout-17b-16e-instruct",
+    // Telegram ID: владелец, Kate
+    "ALLOWED_USER_IDS": "861165606,470022139",
+    "DEFAULT_TZ": "Europe/Minsk",
+    "DEFAULT_CURRENCY": "BYN",
+    "MINIAPP_SHORT_NAME": "app",
+    "PUBLIC_URL": "https://finance-tracker-dev.aksnickolas.workers.dev",
+    // Результат getMe: grammY не вызывает его на каждом холодном старте
+    "BOT_INFO": {
+      "id": 8858199164,
+      "is_bot": true,
+      "first_name": "Finance Tracker Dev",
+      "username": "personal_finance_track_dev_bot",
+      "can_join_groups": true,
+      "can_read_all_group_messages": true,
+      "supports_inline_queries": false,
+      "can_connect_to_business": false,
+      "has_main_web_app": false
+    }
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "finance-tracker-db-dev",
+      "database_id": "08ac923e-7eff-4b44-a0da-7c6207d4a9c5",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "queues": {
+    "producers": [{ "binding": "RECEIPT_QUEUE", "queue": "finance-tracker-receipts-dev" }],
+    "consumers": [
+      {
+        "queue": "finance-tracker-receipts-dev",
+        "max_batch_size": 1,
+        "max_batch_timeout": 0,
+        "max_retries": 2
+      }
+    ]
+  },
+  "ai": { "binding": "AI", "remote": true },
+
+  "env": {
+    "production": {
+      "name": "finance-tracker",
+      "vars": {
+        "GEMINI_MODEL": "gemini-3.8-flash",
+        "WORKERS_AI_MODEL": "@cf/meta/llama-4-scout-17b-16e-instruct",
+        "ALLOWED_USER_IDS": "861165606,470022139",
+        "DEFAULT_TZ": "Europe/Minsk",
+        "DEFAULT_CURRENCY": "BYN",
+        "MINIAPP_SHORT_NAME": "app",
+        "PUBLIC_URL": "https://finance-tracker.aksnickolas.workers.dev",
+        "BOT_INFO": {
+          "id": 8839506830,
+          "is_bot": true,
+          "first_name": "Finance Tracker",
+          "username": "personal_finance_track_prod_bot",
+          "can_join_groups": true,
+          "can_read_all_group_messages": true,
+          "supports_inline_queries": false,
+          "can_connect_to_business": false,
+          "has_main_web_app": false
+        }
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "finance-tracker-db",
+          "database_id": "95c38c17-5a8e-49cd-be22-6a1bbe7c0cc3",
+          "migrations_dir": "migrations"
+        }
+      ],
+      "queues": {
+        "producers": [{ "binding": "RECEIPT_QUEUE", "queue": "finance-tracker-receipts" }],
+        "consumers": [
+          {
+            "queue": "finance-tracker-receipts",
+            "max_batch_size": 1,
+            "max_batch_timeout": 0,
+            "max_retries": 2
+          }
+        ]
+      },
+      "ai": { "binding": "AI", "remote": true }
+    }
+  }
+}
