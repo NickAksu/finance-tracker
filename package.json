@@ -26,7 +26,8 @@
     "@grammyjs/auto-retry": "^2.0.2",
     "grammy": "^1.46.0",
     "hono": "^4.13.13",
-    "zod": "^4.6.5"
+    "zod": "^4.6.5",
+    "zxing-wasm": "^3.1.6"
   },
   "devDependencies": {
     "@cloudflare/vitest-plugin": "^1.3.7",

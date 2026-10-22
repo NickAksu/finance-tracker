@@ -12,7 +12,7 @@ interface __BaseEnv_Env {
 	DEFAULT_TZ: "Europe/Minsk";
 	DEFAULT_CURRENCY: "BYN";
 	MINIAPP_SHORT_NAME: "app";
-	PUBLIC_URL: "https://finance-tracker.aksnickolas.workers.dev" | "https://finance-tracker-dev.aksnickolas.workers.dev";
+	PUBLIC_URL: "https://finance-tracker.aksnickolas.workers.dev" | "https://finance-tracker-dev.aksnickolas.workers.dev" | "https://finance-tracker-dev.zoraleta.workers.dev";
 	BOT_INFO: {"id":8839506830,"is_bot":true,"first_name":"Finance Tracker","username":"personal_finance_track_prod_bot","can_join_groups":true,"can_read_all_group_messages":true,"supports_inline_queries":false,"can_connect_to_business":false,"has_main_web_app":false} | {"id":8858199164,"is_bot":true,"first_name":"Finance Tracker Dev","username":"personal_finance_track_dev_bot","can_join_groups":true,"can_read_all_group_messages":true,"supports_inline_queries":false,"can_connect_to_business":false,"has_main_web_app":false};
 	TELEGRAM_BOT_TOKEN: string;
 	GEMINI_API_KEY: string;

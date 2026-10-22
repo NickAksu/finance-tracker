@@ -29,7 +29,7 @@
     "DEFAULT_TZ": "Europe/Minsk",
     "DEFAULT_CURRENCY": "BYN",
     "MINIAPP_SHORT_NAME": "app",
-    "PUBLIC_URL": "https://finance-tracker-dev.aksnickolas.workers.dev",
+    "PUBLIC_URL": "https://finance-tracker-dev.zoraleta.workers.dev",
     // Результат getMe: grammY не вызывает его на каждом холодном старте
     "BOT_INFO": {
       "id": 8858199164,
@@ -47,7 +47,7 @@
     {
       "binding": "DB",
       "database_name": "finance-tracker-db-dev",
-      "database_id": "08ac923e-7eff-4b44-a0da-7c6207d4a9c5",
+      "database_id": "6e74d9c3-19a7-4f59-aff0-4456e3f12ef6",
       "migrations_dir": "migrations"
     }
   ],

@@ -14,7 +14,9 @@ import {
   type ReceiptFileRef,
   type ReceiptSource,
 } from "../db/receipts";
+import { enqueueEcrsReceipt } from "../db/ecrs";
 import { listRules } from "../db/rules";
+import { readEcrsUid } from "../ecrs/read";
 import { formatMoney } from "../domain/money";
 import { normalizeReceipt } from "../domain/normalize";
 import { formatDate } from "../lib/time";
@@ -84,6 +86,25 @@ async function processReceipt(env: Env, api: Api, task: ReceiptTask, status: Sta
   const files: ReceiptFile[] = [];
   for (const f of task.files) {
     files.push({ data: await downloadTelegramFile(api, env.TELEGRAM_BOT_TOKEN, f.tgFileId), mime: f.mime });
+  }
+
+  const uid = await readEcrsUid(files).catch((error) => {
+    console.warn("ecrs qr failed", error);
+    return null;
+  });
+  if (uid) {
+    const statusMessageId = await status.ensureId();
+    await enqueueEcrsReceipt(env.DB, {
+      uid,
+      householdId: household.id,
+      chatId: task.chatId,
+      addedBy: task.addedBy,
+      statusMessageId,
+      source: task.source,
+      files: task.files,
+    });
+    await status.show("⏳ На фото QR электронного чека. Скачиваю страницу через домашний телефон — это занимает около минуты.");
+    return;
   }
 
   const categories = await listActiveCategories(env.DB, household.id);

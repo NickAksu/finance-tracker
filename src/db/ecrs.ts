@@ -1,4 +1,5 @@
 import { nowIso } from "../lib/time";
+import type { ReceiptFileRef, ReceiptSource } from "./receipts";
 
 const LEASE_MS = 2 * 60 * 1000;
 
@@ -21,6 +22,111 @@ export async function enqueueEcrsJob(db: D1Database, uid: string): Promise<{ id:
     .first<{ id: number }>();
   if (!row) throw new Error("Не удалось поставить чек в очередь");
   return { id: row.id, created: true };
+}
+
+export interface EcrsReceiptRequest {
+  uid: string;
+  householdId: number;
+  chatId: number;
+  addedBy: number;
+  statusMessageId: number | null;
+  source: ReceiptSource;
+  files: ReceiptFileRef[];
+}
+
+/** Отдельная задача на каждое фото: страницу скачает телефон, ответ уйдёт в этот чат. */
+export async function enqueueEcrsReceipt(db: D1Database, req: EcrsReceiptRequest): Promise<number> {
+  const now = nowIso();
+  const row = await db
+    .prepare(
+      `INSERT INTO ecrs_jobs (uid, status, created_at, updated_at, household_id, chat_id, added_by, status_message_id, source, files_json)
+       VALUES (?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id`,
+    )
+    .bind(
+      req.uid.toUpperCase(),
+      now,
+      now,
+      req.householdId,
+      req.chatId,
+      req.addedBy,
+      req.statusMessageId,
+      req.source,
+      JSON.stringify(req.files),
+    )
+    .first<{ id: number }>();
+  if (!row) throw new Error("Не удалось поставить чек в очередь");
+  return row.id;
+}
+
+export interface EcrsJobRecord {
+  id: number;
+  uid: string;
+  status: string;
+  html: string | null;
+  householdId: number | null;
+  chatId: number | null;
+  addedBy: number | null;
+  statusMessageId: number | null;
+  source: ReceiptSource;
+  files: ReceiptFileRef[];
+}
+
+export async function getEcrsJob(db: D1Database, id: number): Promise<EcrsJobRecord | null> {
+  const row = await db
+    .prepare(
+      `SELECT id, uid, status, html, household_id, chat_id, added_by, status_message_id, source, files_json
+       FROM ecrs_jobs WHERE id = ?`,
+    )
+    .bind(id)
+    .first<{
+      id: number;
+      uid: string;
+      status: string;
+      html: string | null;
+      household_id: number | null;
+      chat_id: number | null;
+      added_by: number | null;
+      status_message_id: number | null;
+      source: string | null;
+      files_json: string | null;
+    }>();
+  if (!row) return null;
+  return {
+    id: row.id,
+    uid: row.uid,
+    status: row.status,
+    html: row.html,
+    householdId: row.household_id,
+    chatId: row.chat_id,
+    addedBy: row.added_by,
+    statusMessageId: row.status_message_id,
+    source: asSource(row.source),
+    files: parseFiles(row.files_json),
+  };
+}
+
+function asSource(source: string | null): ReceiptSource {
+  if (source === "photo" || source === "pdf" || source === "text" || source === "miniapp") return source;
+  return "photo";
+}
+
+function parseFiles(raw: string | null): ReceiptFileRef[] {
+  if (!raw) return [];
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return [];
+  }
+  if (!Array.isArray(parsed)) return [];
+  const files: ReceiptFileRef[] = [];
+  for (const item of parsed) {
+    if (!item || typeof item !== "object") continue;
+    const file = item as Record<string, unknown>;
+    if (typeof file.tgFileId !== "string" || typeof file.tgFileUniqueId !== "string" || typeof file.mime !== "string") continue;
+    files.push({ tgFileId: file.tgFileId, tgFileUniqueId: file.tgFileUniqueId, mime: file.mime });
+  }
+  return files;
 }
 
 /** Забирает одну ожидающую задачу. Просроченная аренда снова доступна. */

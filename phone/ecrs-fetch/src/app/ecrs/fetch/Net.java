@@ -67,7 +67,9 @@ final class Net {
     private static String hostOf(String base) throws Exception {
         String host = new URL(base).getHost();
         if (!"finance-tracker-dev.aksnickolas.workers.dev".equals(host)
-                && !"finance-tracker.aksnickolas.workers.dev".equals(host)) {
+                && !"finance-tracker.aksnickolas.workers.dev".equals(host)
+                && !"finance-tracker-dev.zoraleta.workers.dev".equals(host)
+                && !"finance-tracker.zoraleta.workers.dev".equals(host)) {
             throw new Exception("неизвестный адрес бота");
         }
         return host;

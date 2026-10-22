@@ -1,6 +1,7 @@
 import type { Hono } from "hono";
 import { z } from "zod";
 import { claimEcrsJob, enqueueEcrsJob, finishEcrsJob } from "../db/ecrs";
+import { settleEcrsJob } from "../jobs/ecrs-publish";
 import type { ApiEnv } from "./index";
 
 const UID_RE = /^[0-9A-Fa-f]{24}$/;
@@ -61,6 +62,7 @@ export function registerEcrs(api: Hono<ApiEnv>): void {
       : await finishEcrsJob(c.env.DB, body.id, { ok: false, error: body.error || "не скачалось" });
     if (saved === null) return Response.json({ error: "bad_request" }, { status: 400 });
     if (!saved) return Response.json({ error: "not_found" }, { status: 404 });
+    await settleEcrsJob(c.env, body.id).catch((error) => console.error("ecrs settle", error));
     return new Response(null, { status: 204 });
   });
 }
