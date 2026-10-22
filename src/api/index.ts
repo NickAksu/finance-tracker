@@ -5,6 +5,7 @@ import type { ContentfulStatusCode } from "hono/utils/http-status";
 import type { ApiErrorCode, Household, MeResponse, Member } from "../../shared/api";
 import { getMemberContext, listMembers } from "../db/members";
 import { validateInitData, type TelegramWebAppUser, type ValidatedInitData } from "./auth";
+import { registerEcrs } from "./ecrs";
 
 export interface ApiVariables {
   /** Пользователь Telegram из проверенного initData. */
@@ -64,8 +65,9 @@ export function createApi(): Hono<ApiEnv> {
     return apiError("internal", 500);
   });
 
-  // Без авторизации — регистрируется до middleware.
+  // Без авторизации Mini App — регистрируется до middleware.
   api.get("/health", (c) => c.json({ ok: true }));
+  registerEcrs(api);
 
   api.use("*", requireMember);
 

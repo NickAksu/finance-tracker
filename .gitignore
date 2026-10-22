@@ -126,6 +126,9 @@ tsc/testdata/baselines/tmp
 /tests/webhost/*.d.ts
 /tests/webhost/webtsc.js
 
+# Сборка программы для домашнего телефона
+/phone/ecrs-fetch/build/
+
 # Generated development tools
 tools/custom-gcl
 tools/custom-gcl.exe

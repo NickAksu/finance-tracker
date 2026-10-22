@@ -13,3 +13,6 @@ GEMINI_API_KEY=
 
 # Секрет вебхука Telegram: openssl rand -hex 32
 WEBHOOK_SECRET=
+
+# Секрет домашнего телефона, который скачивает mch.ecrs.by. openssl rand -hex 32
+ECRS_FETCH_SECRET=

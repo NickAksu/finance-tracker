@@ -17,6 +17,7 @@ interface __BaseEnv_Env {
 	TELEGRAM_BOT_TOKEN: string;
 	GEMINI_API_KEY: string;
 	WEBHOOK_SECRET: string;
+	ECRS_FETCH_SECRET: string;
 }
 declare namespace Cloudflare {
 	interface GlobalProps {
@@ -38,6 +39,7 @@ declare namespace Cloudflare {
 		TELEGRAM_BOT_TOKEN: string;
 		GEMINI_API_KEY: string;
 		WEBHOOK_SECRET: string;
+		ECRS_FETCH_SECRET: string;
 	}
 	interface Env extends __BaseEnv_Env {}
 }
@@ -46,7 +48,7 @@ type StringifyValues<EnvType extends Record<string, unknown>> = {
 	[Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
 };
 declare namespace NodeJS {
-	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "GEMINI_MODEL" | "WORKERS_AI_MODEL" | "ALLOWED_USER_IDS" | "DEFAULT_TZ" | "DEFAULT_CURRENCY" | "MINIAPP_SHORT_NAME" | "PUBLIC_URL" | "BOT_INFO" | "TELEGRAM_BOT_TOKEN" | "GEMINI_API_KEY" | "WEBHOOK_SECRET">> {}
+	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "GEMINI_MODEL" | "WORKERS_AI_MODEL" | "ALLOWED_USER_IDS" | "DEFAULT_TZ" | "DEFAULT_CURRENCY" | "MINIAPP_SHORT_NAME" | "PUBLIC_URL" | "BOT_INFO" | "TELEGRAM_BOT_TOKEN" | "GEMINI_API_KEY" | "WEBHOOK_SECRET" | "ECRS_FETCH_SECRET">> {}
 }
 declare module "*.txt" {
 	const value: string;

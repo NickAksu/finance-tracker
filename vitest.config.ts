@@ -16,6 +16,7 @@ export default defineConfig(async () => {
             TELEGRAM_BOT_TOKEN: "123456:TEST_TOKEN",
             GEMINI_API_KEY: "test-gemini-key",
             WEBHOOK_SECRET: "test-webhook-secret",
+            ECRS_FETCH_SECRET: "test-ecrs-secret",
           },
         },
       }),
